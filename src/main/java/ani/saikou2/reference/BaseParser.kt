@@ -1,10 +1,8 @@
-package tel.jeelpa.saipose.reference
+package ani.saikou2.reference
 
-import java.io.Serializable
-import java.net.URLDecoder
-import java.net.URLEncoder
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class Media(
     val id: Int,
 
@@ -24,106 +22,108 @@ data class Media(
     var crunchySlug: String? = null,
 
     var nameMAL: String? = null,
-) : Serializable {
+) {
 
-    fun mainName() = nameMAL ?: name ?: nameRomaji
-    fun mangaName() = if (countryOfOrigin != "JP") mainName() else nameRomaji
+    val mainName = nameMAL ?: name ?: nameRomaji
+    val mangaName = if (countryOfOrigin != "JP") mainName else nameRomaji
 }
 
-abstract class BaseParser {
+interface BaseParser {
 
     /**
      * Name that will be shown in Source Selection
      * **/
-    abstract val name: String
+    val name: String
 
     /**
      * Name used to save the ShowResponse selected by user or by autoSearch
      * **/
-    abstract val saveName: String
+    val saveName: String
 
     /**
      * The main URL of the Site
      * **/
-    abstract val hostUrl: String
+    val hostUrl: String
 
     /**
      * override as `true` if the site **only** has NSFW media
      * **/
-    open val isNSFW = false
+    val isNSFW
+        get() = false
 
     /**
      * mostly redundant for official app, But override if you want to add different languages
      * **/
-    open val language = "English"
+    val language
+        get() = "English"
 
     /**
      *  Search for Anime/Manga/Novel, returns a List of Responses
      *
      *  use `encode(query)` to encode the query for making requests
      * **/
-    abstract suspend fun search(query: String): List<ShowResponse>
+    suspend fun search(query: String): List<ShowResponse>
 
     /**
      * The function app uses to auto find the anime/manga using Media data provided by anilist
      *
      * Isn't necessary to override, but recommended, if you want to improve auto search results
      * **/
-    open suspend fun autoSearch(mediaObj: Media): ShowResponse? {
-        var response = loadSavedShowResponse(mediaObj.id)
-        if (response != null) {
-            saveShowResponse(mediaObj.id, response, true)
-        } else {
-            setUserText("Searching : ${mediaObj.mainName()}")
-            response = search(mediaObj.mainName()).let { if (it.isNotEmpty()) it[0] else null }
-
-            if (response == null) {
-                setUserText("Searching : ${mediaObj.nameRomaji}")
-                response = search(mediaObj.nameRomaji).let { if (it.isNotEmpty()) it[0] else null }
-            }
-            saveShowResponse(mediaObj.id, response)
-        }
-        return response
-    }
+//    open suspend fun autoSearch(mediaObj: Media): ShowResponse? {
+//        var response = loadSavedShowResponse(mediaObj.id)
+//        if (response != null) {
+//            saveShowResponse(mediaObj.id, response, true)
+//        } else {
+//            setUserText("Searching : ${mediaObj.mainName()}")
+//            response = search(mediaObj.mainName()).let { if (it.isNotEmpty()) it[0] else null }
+//
+//            if (response == null) {
+//                setUserText("Searching : ${mediaObj.nameRomaji}")
+//                response = search(mediaObj.nameRomaji).let { if (it.isNotEmpty()) it[0] else null }
+//            }
+//            saveShowResponse(mediaObj.id, response)
+//        }
+//        return response
+//    }
 
     /**
      * Used to get an existing Search Response which was selected by the user.
      * **/
-    open suspend fun loadSavedShowResponse(mediaId: Int): ShowResponse? {
-        checkIfVariablesAreEmpty()
-        return loadData("${saveName}_$mediaId")
-    }
+//    open suspend fun loadSavedShowResponse(mediaId: Int): ShowResponse? {
+//        checkIfVariablesAreEmpty()
+//        return loadData("${saveName}_$mediaId")
+//    }
 
     /**
      * Used to save Shows Response using `saveName`.
      * **/
-    open fun saveShowResponse(mediaId: Int, response: ShowResponse?, selected: Boolean = false) {
-        if (response != null) {
-            checkIfVariablesAreEmpty()
-            setUserText("${if (selected) "Selected" else "Found"} : ${response.name}")
-            saveData("${saveName}_$mediaId", response)
-        }
-    }
+//    open fun saveShowResponse(mediaId: Int, response: ShowResponse?, selected: Boolean = false) {
+//        if (response != null) {
+//            checkIfVariablesAreEmpty()
+//            setUserText("${if (selected) "Selected" else "Found"} : ${response.name}")
+//            saveData("${saveName}_$mediaId", response)
+//        }
+//    }
 
-    fun checkIfVariablesAreEmpty() {
-        if (hostUrl.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `hostUrl` for the Parser")
-        if (name.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `name` for the Parser")
-        if (saveName.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `saveName` for the Parser")
-    }
+//    fun checkIfVariablesAreEmpty() {
+//        if (hostUrl.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `hostUrl` for the Parser")
+//        if (name.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `name` for the Parser")
+//        if (saveName.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `saveName` for the Parser")
+//    }
 
-    open var showUserText = ""
-    open fun showUserTextListener(text: String) {}
+//    open var showUserText = ""
+//    open fun showUserTextListener(text: String) {}
 
     /**
      * Used to show messages & errors to the User, a useful way to convey what's currently happening or what was done.
      * **/
-    fun setUserText(string: String) {
-        showUserText = string
-        showUserTextListener(showUserText)
-    }
+//    fun setUserText(string: String) {
+//        showUserText = string
+//        showUserTextListener(showUserText)
+//    }
 
-    fun encode(input: String): String = URLEncoder.encode(input, "utf-8").replace("+", "%20")
-    fun decode(input: String): String = URLDecoder.decode(input, "utf-8")
+//    fun encode(input: String): String = URLEncoder.encode(input, "utf-8").replace("+", "%20")
+//    fun decode(input: String): String = URLDecoder.decode(input, "utf-8")
 }
 
 
@@ -135,6 +135,7 @@ abstract class BaseParser {
  *
  * You can also store a Map of Strings if you want to save some extra data.
  * **/
+@Serializable
 data class ShowResponse(
     val name: String,
     val link: String,
@@ -148,16 +149,4 @@ data class ShowResponse(
 
     //In case you want to send some extra data
     val extra : Map<String,String>?=null,
-) : Serializable {
-    constructor(name: String, link: String, coverUrl: String, otherNames: List<String> = listOf(), total: Int? = null, extra: Map<String, String>?=null)
-            : this(name, link, FileUrl(coverUrl), otherNames, total, extra)
-
-    constructor(name: String, link: String, coverUrl: String, otherNames: List<String> = listOf(), total: Int? = null)
-            : this(name, link, FileUrl(coverUrl), otherNames, total)
-
-    constructor(name: String, link: String, coverUrl: String, otherNames: List<String> = listOf())
-            : this(name, link, FileUrl(coverUrl), otherNames)
-
-    constructor(name: String, link: String, coverUrl: String)
-            : this(name, link, FileUrl(coverUrl))
-}
+)

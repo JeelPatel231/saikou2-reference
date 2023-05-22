@@ -1,4 +1,4 @@
-package tel.jeelpa.saipose.reference
+package ani.saikou2.reference
 
 
 import dev.brahmkshatriya.nicehttp.Requests
@@ -9,11 +9,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import okhttp3.OkHttpClient
-import java.io.Serializable
 import java.util.concurrent.*
 import kotlin.math.min
 import kotlin.reflect.KClass
@@ -80,7 +78,7 @@ object Mapper : ResponseParser {
     }
 
     @OptIn(InternalSerializationApi::class)
-    override fun <T : Any> parse(text: String, kClass: KClass<T>): T {
+    override fun < T : Any> parse(text: String, kClass: KClass<T>): T {
         return json.decodeFromString(kClass.serializer(), text)
     }
 
@@ -142,13 +140,14 @@ suspend fun <A, B> Collection<A>.asyncMapNotNull(lambda: suspend (A) -> B?): Lis
 /**
  * A url, which can also have headers
  * **/
+@kotlinx.serialization.Serializable
 data class FileUrl(
     val url: String,
     val headers: Map<String, String> = mapOf()
-) : Serializable {
+) {
     companion object {
-        operator fun get(url: String?, headers: Map<String, String> = mapOf()): FileUrl? {
-            return FileUrl(url ?: return null, headers)
+        operator fun get(url: String, headers: Map<String, String> = mapOf()): FileUrl {
+            return FileUrl(url, headers)
         }
     }
 }

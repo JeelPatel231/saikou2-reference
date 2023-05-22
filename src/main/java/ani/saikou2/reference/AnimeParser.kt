@@ -1,4 +1,4 @@
-package tel.jeelpa.saipose.reference
+package ani.saikou2.reference
 
 
 /**
@@ -9,19 +9,19 @@ package tel.jeelpa.saipose.reference
 
 lateinit var ParserMap : Map<String, AnimeParser>
 
-abstract class AnimeParser : BaseParser() {
+interface AnimeParser : BaseParser {
 
     /**
      * Takes ShowResponse.link & ShowResponse.extra (if you added any) as arguments & gives a list of total episodes present on the site.
      * **/
-    abstract suspend fun loadEpisodes(animeLink: String, extra: Map<String, String>?): List<Episode>
+    suspend fun loadEpisodes(animeLink: String, extra: Map<String, String>?): List<Episode>
 
     /**
      * Takes Episode.link as a parameter
      *
      * This returns a Map of "Video Server's Name" & "Link/Data" of all the Video Servers present on the site, which can be further used by loadVideoServers() & loadSingleVideoServer()
      * **/
-    abstract suspend fun loadVideoServers(episodeLink: String, extra: Map<String,String>?): List<VideoServer>
+    suspend fun loadVideoServers(episodeLink: String, extra: Map<String,String>?): List<VideoServer>
 
     /**
      * Many sites have Dub & Sub anime as separate Shows
@@ -30,7 +30,7 @@ abstract class AnimeParser : BaseParser() {
      *
      * **NOTE : do not forget to override `search` if the site does not support only dub search**
      * **/
-    abstract val isDubAvailableSeparately: Boolean
+    val isDubAvailableSeparately: Boolean
 
 
     /**
@@ -59,13 +59,14 @@ abstract class AnimeParser : BaseParser() {
      * You can use your own way to get the Extractor for reliability.
      * if there's only extractor, you can directly return it.
      * **/
-    abstract suspend fun extractVideo(server: VideoServer): VideoContainer? // nullable for now
+    suspend fun extractVideo(server: VideoServer): VideoContainer? // nullable for now
 
     /**
      * If the Video Servers support preloading links for the videos
      * typically depends on what Video Extractor is being used
      * **/
-    open val allowsPreloading = true
+    val allowsPreloading
+        get() = true
 
     /**
      * This Function used when there "isn't" a default Server set by the user, or when user wants to switch the Server
@@ -103,32 +104,33 @@ abstract class AnimeParser : BaseParser() {
     /**
      * The app changes this, depending on user's choice.
      * **/
-    open var selectDub = false
+//    var selectDub : Boolean
+//        get() = false
 
     /**
      * Name used to get Shows Directly from MALSyncBackup's GitHub dump
      *
      * Do not override if the site is not present on it.
      * **/
-    open val malSyncBackupName = ""
+    val malSyncBackupName:String
 
     /**
      * Overridden to add MalSyncBackup support for Anime Sites
      * **/
-    override suspend fun loadSavedShowResponse(mediaId: Int): ShowResponse? {
-        checkIfVariablesAreEmpty()
-        val dub = if (isDubAvailableSeparately) "_${if (selectDub) "dub" else "sub"}" else ""
-        return loadData<ShowResponse>("$saveName${dub}_$mediaId")
-    }
+//    suspend fun loadSavedShowResponse(mediaId: Int): ShowResponse? {
+//        checkIfVariablesAreEmpty()
+//        val dub = if (isDubAvailableSeparately) "_${if (selectDub) "dub" else "sub"}" else ""
+//        return loadData<ShowResponse>("$saveName${dub}_$mediaId")
+//    }
 
-    override fun saveShowResponse(mediaId: Int, response: ShowResponse?, selected: Boolean) {
-        if (response != null) {
-            checkIfVariablesAreEmpty()
-            setUserText("${if (selected) "Selected" else "Found"} : ${response.name}")
-            val dub = if (isDubAvailableSeparately) "_${if (selectDub) "dub" else "sub"}" else ""
-            saveData("${saveName}${dub}_$mediaId", response)
-        }
-    }
+//    fun saveShowResponse(mediaId: Int, response: ShowResponse?, selected: Boolean) {
+//        if (response != null) {
+//            checkIfVariablesAreEmpty()
+//            setUserText("${if (selected) "Selected" else "Found"} : ${response.name}")
+//            val dub = if (isDubAvailableSeparately) "_${if (selectDub) "dub" else "sub"}" else ""
+//            saveData("${saveName}${dub}_$mediaId", response)
+//        }
+//    }
 }
 
 /**
@@ -156,7 +158,7 @@ data class Episode(
     /**
      * In case, you want to pass extra data
      * **/
-    val extra: Map<String,String>? = null,
+    val extra: Map<String,String> = emptyMap(),
 ) {
     constructor(
         number: String,
@@ -165,6 +167,6 @@ data class Episode(
         thumbnail: String,
         description: String? = null,
         isFiller: Boolean = false,
-        extra: Map<String,String>? = null
+        extra: Map<String,String> = emptyMap()
     ) : this(number, link, title, FileUrl(thumbnail), description, isFiller, extra)
 }

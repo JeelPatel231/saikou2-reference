@@ -1,7 +1,7 @@
-package tel.jeelpa.saipose.reference
+package ani.saikou2.reference
 
 
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
 /**
  * Used to extract videos from a specific video host,
@@ -12,19 +12,8 @@ import java.io.Serializable
 
 lateinit var ExtractorMap : Map<String, VideoExtractor>
 
-abstract class VideoExtractor : Serializable {
-//    abstract val server: VideoServer
-//    var videos: List<Video> = listOf()
-//    var subtitles: List<Subtitle> = listOf()
-
-    abstract suspend fun extract(server : VideoServer): VideoContainer
-//    suspend fun load(): VideoExtractor {
-//        extract().also {
-//            videos = it.videos
-//            subtitles = it.subtitles
-//            return this
-//        }
-//    }
+interface VideoExtractor {
+    suspend fun extract(server : VideoServer): VideoContainer
 //    open suspend fun onVideoPlayed(server: VideoServer, video: Video?) {}
 //    open suspend fun onVideoStopped(server:VideoServer, video: Video?) {}
 }
@@ -36,12 +25,13 @@ abstract class VideoExtractor : Serializable {
  *
  *
  * **/
+@Serializable
 data class VideoServer(
     val name: String,
     val embed: FileUrl,
-    val extraData : Map<String,String>?=null,
-) : Serializable {
-    constructor(name: String, embedUrl: String,extraData : Map<String,String>?=null)
+    val extraData : Map<String,String> = emptyMap(),
+) {
+    constructor(name: String, embedUrl: String,extraData : Map<String,String> = emptyMap())
             : this(name, FileUrl(embedUrl),extraData)
 }
 
@@ -56,6 +46,7 @@ data class VideoContainer(
 /**
  * The Class which contains all the information about a Video
  * **/
+@Serializable
 data class Video(
     /**
      * Will represent quality to user in form of `"${quality}p"` (1080p)
@@ -94,21 +85,12 @@ data class Video(
      * Ex: "Backup" which could be used if the site provides some
      * **/
     val extraNote: String? = null,
-) : Serializable {
-
-    constructor(quality: Int? = null, videoType: VideoType, url: String, size: Double?, extraNote: String? = null)
-            : this(quality, videoType, FileUrl(url), size, extraNote)
-
-    constructor(quality: Int? = null, videoType: VideoType, url: String, size: Double?)
-            : this(quality, videoType, FileUrl(url), size)
-
-    constructor(quality: Int? = null, videoType: VideoType, url: String)
-            : this(quality, videoType, FileUrl(url))
-}
+)
 
 /**
  * The Class which contains the link to a subtitle file of a specific language
  * **/
+@Serializable
 data class Subtitle(
     /**
      * Language of the Subtitle
@@ -129,7 +111,7 @@ data class Subtitle(
      * Supports VTT, SRT & ASS
      * **/
     val type: SubtitleType = SubtitleType.VTT,
-) : Serializable {
+) {
     constructor(language: String, url: String, type: SubtitleType = SubtitleType.VTT) : this(language, FileUrl(url), type)
 }
 
