@@ -1,6 +1,8 @@
 package ani.saikou2.reference
 
 import kotlinx.serialization.Serializable
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 @Serializable
 data class Media(
@@ -64,68 +66,9 @@ interface BaseParser {
      * **/
     suspend fun search(query: String): List<ShowResponse>
 
-    /**
-     * The function app uses to auto find the anime/manga using Media data provided by anilist
-     *
-     * Isn't necessary to override, but recommended, if you want to improve auto search results
-     * **/
-//    open suspend fun autoSearch(mediaObj: Media): ShowResponse? {
-//        var response = loadSavedShowResponse(mediaObj.id)
-//        if (response != null) {
-//            saveShowResponse(mediaObj.id, response, true)
-//        } else {
-//            setUserText("Searching : ${mediaObj.mainName()}")
-//            response = search(mediaObj.mainName()).let { if (it.isNotEmpty()) it[0] else null }
-//
-//            if (response == null) {
-//                setUserText("Searching : ${mediaObj.nameRomaji}")
-//                response = search(mediaObj.nameRomaji).let { if (it.isNotEmpty()) it[0] else null }
-//            }
-//            saveShowResponse(mediaObj.id, response)
-//        }
-//        return response
-//    }
-
-    /**
-     * Used to get an existing Search Response which was selected by the user.
-     * **/
-//    open suspend fun loadSavedShowResponse(mediaId: Int): ShowResponse? {
-//        checkIfVariablesAreEmpty()
-//        return loadData("${saveName}_$mediaId")
-//    }
-
-    /**
-     * Used to save Shows Response using `saveName`.
-     * **/
-//    open fun saveShowResponse(mediaId: Int, response: ShowResponse?, selected: Boolean = false) {
-//        if (response != null) {
-//            checkIfVariablesAreEmpty()
-//            setUserText("${if (selected) "Selected" else "Found"} : ${response.name}")
-//            saveData("${saveName}_$mediaId", response)
-//        }
-//    }
-
-//    fun checkIfVariablesAreEmpty() {
-//        if (hostUrl.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `hostUrl` for the Parser")
-//        if (name.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `name` for the Parser")
-//        if (saveName.isEmpty()) throw UninitializedPropertyAccessException("Please provide a `saveName` for the Parser")
-//    }
-
-//    open var showUserText = ""
-//    open fun showUserTextListener(text: String) {}
-
-    /**
-     * Used to show messages & errors to the User, a useful way to convey what's currently happening or what was done.
-     * **/
-//    fun setUserText(string: String) {
-//        showUserText = string
-//        showUserTextListener(showUserText)
-//    }
-
-//    fun encode(input: String): String = URLEncoder.encode(input, "utf-8").replace("+", "%20")
-//    fun decode(input: String): String = URLDecoder.decode(input, "utf-8")
+    fun encode(input: String): String = URLEncoder.encode(input, "utf-8").replace("+", "%20")
+    fun decode(input: String): String = URLDecoder.decode(input, "utf-8")
 }
-
 
 
 /**
@@ -148,5 +91,16 @@ data class ShowResponse(
     val total: Int? = null,
 
     //In case you want to send some extra data
-    val extra : Map<String,String>?=null,
-)
+    val extra: Map<String, String> = emptyMap(),
+) {
+    constructor(
+        name: String,
+        link: String,
+        coverUrl: String,
+        otherNames: List<String> = emptyList(),
+        total: Int? = null,
+        extra: Map<String, String> = emptyMap()
+    ) : this(
+        name, link, FileUrl(coverUrl), otherNames, total, extra
+    )
+}

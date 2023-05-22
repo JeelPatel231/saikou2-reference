@@ -10,10 +10,10 @@ import kotlinx.serialization.Serializable
  * **/
 
 
-lateinit var ExtractorMap : Map<String, VideoExtractor>
+lateinit var ExtractorMap: Map<String, VideoExtractor>
 
 interface VideoExtractor {
-    suspend fun extract(server : VideoServer): VideoContainer
+    suspend fun extract(server: VideoServer): VideoContainer
 //    open suspend fun onVideoPlayed(server: VideoServer, video: Video?) {}
 //    open suspend fun onVideoStopped(server:VideoServer, video: Video?) {}
 }
@@ -29,10 +29,10 @@ interface VideoExtractor {
 data class VideoServer(
     val name: String,
     val embed: FileUrl,
-    val extraData : Map<String,String> = emptyMap(),
+    val extraData: Map<String, String> = emptyMap(),
 ) {
-    constructor(name: String, embedUrl: String,extraData : Map<String,String> = emptyMap())
-            : this(name, FileUrl(embedUrl),extraData)
+    constructor(name: String, embedUrl: String, extraData: Map<String, String> = emptyMap())
+            : this(name, FileUrl(embedUrl), extraData)
 }
 
 /**
@@ -85,7 +85,15 @@ data class Video(
      * Ex: "Backup" which could be used if the site provides some
      * **/
     val extraNote: String? = null,
-)
+) {
+    constructor(
+        quality: Int?,
+        format: VideoType,
+        url: String,
+        size: Double? = null,
+        extraNote: String? = null,
+    ) : this(quality, format, FileUrl(url), size, extraNote)
+}
 
 /**
  * The Class which contains the link to a subtitle file of a specific language
@@ -112,13 +120,21 @@ data class Subtitle(
      * **/
     val type: SubtitleType = SubtitleType.VTT,
 ) {
-    constructor(language: String, url: String, type: SubtitleType = SubtitleType.VTT) : this(language, FileUrl(url), type)
+    constructor(language: String, url: String, type: SubtitleType = SubtitleType.VTT) : this(
+        language,
+        FileUrl(url),
+        type
+    )
 }
 
-enum class VideoType{
-    CONTAINER, M3U8, DASH
+enum class VideoType {
+    CONTAINER,
+    M3U8,
+    DASH
 }
 
-enum class SubtitleType{
-    VTT, ASS, SRT
+enum class SubtitleType {
+    VTT,
+    ASS,
+    SRT
 }

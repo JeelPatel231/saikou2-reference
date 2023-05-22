@@ -14,14 +14,14 @@ interface AnimeParser : BaseParser {
     /**
      * Takes ShowResponse.link & ShowResponse.extra (if you added any) as arguments & gives a list of total episodes present on the site.
      * **/
-    suspend fun loadEpisodes(animeLink: String, extra: Map<String, String>?): List<Episode>
+    suspend fun loadEpisodes(animeLink: String, extra: Map<String, String> = emptyMap()): List<Episode>
 
     /**
      * Takes Episode.link as a parameter
      *
      * This returns a Map of "Video Server's Name" & "Link/Data" of all the Video Servers present on the site, which can be further used by loadVideoServers() & loadSingleVideoServer()
      * **/
-    suspend fun loadVideoServers(episodeLink: String, extra: Map<String,String>?): List<VideoServer>
+    suspend fun loadVideoServers(episodeLink: String, extra: Map<String,String> = emptyMap()): List<VideoServer>
 
     /**
      * Many sites have Dub & Sub anime as separate Shows
@@ -69,68 +69,12 @@ interface AnimeParser : BaseParser {
         get() = true
 
     /**
-     * This Function used when there "isn't" a default Server set by the user, or when user wants to switch the Server
-     *
-     * Doesn't need to be overridden, if the parser is following the norm.
-     * **/
-//    open suspend fun loadByVideoServers(episodeUrl: String, extra: Map<String,String>?, callback: (VideoExtractor) -> Unit) {
-//        loadVideoServers(episodeUrl, extra).asyncMap {
-//            getVideoExtractor(it)?.apply {
-//                load()
-//                callback(this)
-//            }
-//        }
-//    }
-
-    /**
-     * This Function used when there "is" a default Server set by the user, only loads a Single Server for faster response.
-     *
-     * Doesn't need to be overridden, if the parser is following the norm.
-     * **/
-//    open suspend fun loadSingleVideoServer(
-//        serverName: String,
-//        episodeUrl: String,
-//        extra: Map<String, String>?
-//    ): VideoExtractor? {
-//        val videoServer =
-//            with(loadVideoServers(episodeUrl, extra)) { find { it.name == serverName } }
-//                ?: return null
-//        return getVideoExtractor(videoServer)?.apply {
-//            load()
-//        }
-//    }
-
-
-    /**
-     * The app changes this, depending on user's choice.
-     * **/
-//    var selectDub : Boolean
-//        get() = false
-
-    /**
      * Name used to get Shows Directly from MALSyncBackup's GitHub dump
      *
      * Do not override if the site is not present on it.
      * **/
     val malSyncBackupName:String
 
-    /**
-     * Overridden to add MalSyncBackup support for Anime Sites
-     * **/
-//    suspend fun loadSavedShowResponse(mediaId: Int): ShowResponse? {
-//        checkIfVariablesAreEmpty()
-//        val dub = if (isDubAvailableSeparately) "_${if (selectDub) "dub" else "sub"}" else ""
-//        return loadData<ShowResponse>("$saveName${dub}_$mediaId")
-//    }
-
-//    fun saveShowResponse(mediaId: Int, response: ShowResponse?, selected: Boolean) {
-//        if (response != null) {
-//            checkIfVariablesAreEmpty()
-//            setUserText("${if (selected) "Selected" else "Found"} : ${response.name}")
-//            val dub = if (isDubAvailableSeparately) "_${if (selectDub) "dub" else "sub"}" else ""
-//            saveData("${saveName}${dub}_$mediaId", response)
-//        }
-//    }
 }
 
 /**
