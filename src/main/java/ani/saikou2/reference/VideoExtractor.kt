@@ -93,6 +93,12 @@ data class Video(
         size: Double? = null,
         extraNote: String? = null,
     ) : this(quality, format, FileUrl(url), size, extraNote)
+
+    constructor(quality: Int? = null, videoType: VideoType, url: String, size: Double?)
+            : this(quality, videoType, FileUrl(url), size)
+
+    constructor(quality: Int? = null, videoType: VideoType, url: String)
+            : this(quality, videoType, FileUrl(url))
 }
 
 /**

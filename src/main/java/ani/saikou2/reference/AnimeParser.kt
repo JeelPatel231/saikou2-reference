@@ -73,7 +73,7 @@ interface AnimeParser : BaseParser {
      *
      * Do not override if the site is not present on it.
      * **/
-    val malSyncBackupName:String
+    val malSyncBackupName:String? get() = ""
 
 }
 
