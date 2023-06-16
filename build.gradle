@@ -5,10 +5,13 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+kotlin {
+    jvmToolchain(8)
+}
 dependencies {
     api "com.squareup.okhttp3:okhttp:4.10.0"
     api "com.github.brahmkshatriya:NiceHttp:1.1.0"
